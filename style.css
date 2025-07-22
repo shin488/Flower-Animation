@@ -67,7 +67,10 @@ body {
     background-color: #ffc0cb; /* 花びらの色 (ピンク) */
     border-radius: 50% 50% 0 0; /* 上半分を丸く */
     transform-origin: bottom center; /* 花びらの根元を中心に回転 */
-    opacity: 0; /* 最初は非表示 */
+    transform: rotate(var(--initial-rotation, 0deg)) scaleY(0.1) rotateX(70deg); /* 閉じた状態 (内側に傾き、縮小) */
+    transform-style: preserve-3d; /* 3D変形を有効に */
+    backface-visibility: hidden; /* 裏面を見せない */
+
     animation: openPetal 3s forwards 4s; /* 花びらが開くアニメーション (4秒遅延) */
 }
 
@@ -89,6 +92,11 @@ body {
     z-index: 3;
     opacity: 0; /* 最初は非表示 */
     animation: fadeIn 1s forwards 6s; /* 中心がフェードイン (6秒遅延) */
+}
+
+/* 花が開いた後のきらめき */
+.glow {
+    animation: centerGlow 1.5s infinite alternate 6.5s; /* fadeInの後にきらめき開始 */
 }
 
 /* アニメーションの定義 */
@@ -117,15 +125,18 @@ body {
 
 @keyframes openPetal {
     0% {
-        transform: rotate(var(--initial-rotation, 0deg)) scaleY(0); /* 最初は閉じていて見えない */
-        opacity: 0;
+        transform: rotate(var(--initial-rotation, 0deg)) scaleY(0.1) rotateX(70deg); /* 閉じた状態 (内側に傾き、縮小) */
+        opacity: 0; /* 最初は完全に見えない */
     }
-    50% {
-        transform: rotate(var(--initial-rotation, 0deg)) scaleY(1); /* 縦に伸びるように開く */
-        opacity: 1;
+    30% {
+        transform: rotate(var(--initial-rotation, 0deg)) scaleY(0.4) rotateX(40deg); /* 少し開いて、まだ傾いている */
+        opacity: 1; /* 徐々に現れる */
+    }
+    70% {
+        transform: rotate(var(--initial-rotation, 0deg)) scaleY(0.9) rotateX(10deg); /* ほぼ開ききり、少し傾きが残る */
     }
     100% {
-        transform: rotate(var(--initial-rotation, 0deg)); /* 最終的な位置 */
+        transform: rotate(var(--initial-rotation, 0deg)) scaleY(1) rotateX(0deg); /* 全開 (まっすぐになる) */
         opacity: 1;
     }
 }
@@ -142,3 +153,11 @@ body {
     0% { opacity: 0; }
     100% { opacity: 1; }
 }
+
+@keyframes centerGlow {
+    0% {
+        box-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700 inset;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        box-shadow: 0 0 20px #ffea00, 0 0 40px #ffea00
