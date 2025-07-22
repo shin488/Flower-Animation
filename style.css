@@ -31,11 +31,15 @@ body {
     animation: sunRise 10s forwards; /* 太陽が昇るアニメーション */
 }
 
+/* ★ここから修正点★ */
 .flower-container {
-    position: relative;
+    position: absolute; /* relative から absolute に変更 */
     bottom: 50px; /* 地面からの高さ */
+    left: 50%; /* 中央に配置 */
+    transform: translateX(-50%); /* 中央揃えのための調整 */
     transform-origin: bottom center; /* 茎の根元を中心に回転 */
     animation: sway 3s infinite alternate ease-in-out; /* 茎が揺れるアニメーション */
+    z-index: 10; /* 他の要素より手前に表示 */
 }
 
 .stem {
@@ -54,7 +58,7 @@ body {
     transform: translateX(-50%);
     width: 80px;
     height: 80px;
-    /* overflow: hidden; */ /* 花びらがはみ出さないように */
+    /* overflow: hidden; */ /* ★ここをコメントアウト★ */
     z-index: 2;
     transform-origin: center bottom; /* 花の頭が茎の先端を中心に回転 */
     animation: faceSun 8s forwards 2s; /* 太陽を向くアニメーション (2秒遅延) */
@@ -70,6 +74,7 @@ body {
     transform: rotate(var(--initial-rotation, 0deg)) scaleY(0.1) rotateX(70deg); /* 閉じた状態 (内側に傾き、縮小) */
     transform-style: preserve-3d; /* 3D変形を有効に */
     backface-visibility: hidden; /* 裏面を見せない */
+    opacity: 1; /* ★ここを1に設定し、最初は見えるように★ */
 
     animation: openPetal 3s forwards 4s; /* 花びらが開くアニメーション (4秒遅延) */
 }
@@ -160,4 +165,11 @@ body {
         transform: translate(-50%, -50%) scale(1);
     }
     50% {
-        box-shadow: 0 0 20px #ffea00, 0 0 40px #ffea00
+        box-shadow: 0 0 20px #ffea00, 0 0 40px #ffea00 inset; /* 強く光る */
+        transform: translate(-50%, -50%) scale(1.1); /* 少し拡大 */
+    }
+    100% {
+        box-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700 inset;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
