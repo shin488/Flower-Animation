@@ -1,11 +1,11 @@
 body {
     margin: 0;
-    overflow: hidden; /* スクロールバーが出ないように */
+    overflow: hidden;
     display: flex;
     justify-content: center;
-    align-items: flex-end; /* 下に配置 */
+    align-items: flex-end; /* 地面から出るアニメーションのため下揃えを維持 */
     min-height: 100vh;
-    background-color: #f0f8ff; /* 薄い水色の背景 */
+    background-color: #f0f8ff;
 }
 
 .sky {
@@ -14,145 +14,196 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, #87ceeb, #f0f8ff); /* 空のグラデーション */
-    animation: sunrise 10s forwards; /* 夜明けのアニメーション */
+    background: linear-gradient(to bottom, #87ceeb, #f0f8ff);
+    animation: sunrise 10s forwards;
 }
 
 .sun {
     position: absolute;
-    top: 80%; /* 最初は下の方に隠れている */
+    top: 80%;
     left: 50%;
     transform: translateX(-50%);
     width: 100px;
     height: 100px;
-    background-color: #ffeb3b; /* 太陽の色 */
+    background-color: #ffeb3b;
     border-radius: 50%;
     box-shadow: 0 0 30px #ffeb3b, 0 0 60px #ffc107;
-    animation: sunRise 10s forwards; /* 太陽が昇るアニメーション */
+    animation: sunRise 10s forwards;
 }
 
-/* ★ここから修正点★ */
+/* ★ここから変更・追加点★ */
 .flower-container {
-    position: absolute; /* relative から absolute に変更 */
-    bottom: 50px; /* 地面からの高さ */
-    left: 50%; /* 中央に配置 */
-    transform: translateX(-50%); /* 中央揃えのための調整 */
-    transform-origin: bottom center; /* 茎の根元を中心に回転 */
-    animation: sway 3s infinite alternate ease-in-out; /* 茎が揺れるアニメーション */
-    z-index: 10; /* 他の要素より手前に表示 */
+    position: absolute;
+    bottom: 0; /* 地面から始めるため0に */
+    left: 50%;
+    transform: translateX(-50%);
+    transform-origin: bottom center;
+    animation: sway 3s infinite alternate ease-in-out 11s; /* 全てのアニメーション後に揺れる */
+    z-index: 10;
+}
+
+.bud { /* 芽 */
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 0px; /* 最初は高さ0 */
+    background-color: #4CAF50;
+    border-radius: 5px 5px 0 0;
+    transform-origin: bottom;
+    animation: budGrow 2s forwards 2s; /* 2秒後に芽が伸び始める */
+    z-index: 0;
 }
 
 .stem {
     width: 10px;
-    height: 150px;
-    background-color: #4CAF50; /* 茎の色 */
+    height: 0px; /* 最初は高さ0 */
+    background-color: #4CAF50;
     border-radius: 5px;
-    position: relative;
+    position: absolute; /* absolute に変更 */
+    bottom: 0; /* 地面から生えるように */
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 1;
+    animation: stemGrow 3s forwards 4s; /* 芽の成長後に茎が伸びる */
+}
+
+.bud-head { /* つぼみ */
+    position: absolute;
+    bottom: 0; /* 茎の成長と連動させるため最初は0 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
+    background-color: #ffc0cb; /* つぼみの色 */
+    border-radius: 50% 50% 0 0;
+    opacity: 0; /* 最初は非表示 */
+    z-index: 2;
+    transform-origin: center bottom;
+    animation: budAppear 1s forwards 7s, /* 茎の成長後につぼみが出現 */
+               budFadeOut 0.5s forwards 9s; /* 花が開く前につぼみが消える */
 }
 
 .flower-head {
     position: absolute;
-    bottom: 140px; /* 茎の先端に配置 */
+    bottom: 0; /* 茎の成長と連動させるため最初は0 */
     left: 50%;
     transform: translateX(-50%);
     width: 80px;
     height: 80px;
-    /* overflow: hidden; */ /* ★ここをコメントアウト★ */
+    opacity: 0; /* 最初は非表示 */
     z-index: 2;
-    transform-origin: center bottom; /* 花の頭が茎の先端を中心に回転 */
-    animation: faceSun 8s forwards 2s; /* 太陽を向くアニメーション (2秒遅延) */
+    transform-origin: center bottom;
+    animation: faceSun 8s forwards 10s, /* 太陽を向くアニメーション (開花後) */
+               flowerFadeIn 0.5s forwards 9.5s; /* つぼみが消えた後に花がフェードイン */
 }
 
 .petal {
     position: absolute;
     width: 40px;
     height: 60px;
-    background-color: #ffc0cb; /* 花びらの色 (ピンク) */
-    border-radius: 50% 50% 0 0; /* 上半分を丸く */
-    transform-origin: bottom center; /* 花びらの根元を中心に回転 */
-    transform: rotate(var(--initial-rotation, 0deg)) scaleY(0.1) rotateX(70deg); /* 閉じた状態 (内側に傾き、縮小) */
-    transform-style: preserve-3d; /* 3D変形を有効に */
-    backface-visibility: hidden; /* 裏面を見せない */
-    opacity: 1; /* ★ここを1に設定し、最初は見えるように★ */
-
-    animation: openPetal 3s forwards 4s; /* 花びらが開くアニメーション (4秒遅延) */
+    background-color: #ffc0cb;
+    border-radius: 50% 50% 0 0;
+    transform-origin: bottom center;
+    /* 芽の状態から開花へ */
+    transform: rotate(var(--initial-rotation, 0deg)) scaleY(0.01) rotateX(90deg); /* 完全に見えない状態 */
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    opacity: 0; /* 最初は完全に見えない */
+    animation: openPetal 3s forwards 10s; /* 花びらが開くアニメーション (花フェードイン後) */
 }
 
-.petal-1 { transform: rotate(0deg); animation-delay: 4.0s; }
-.petal-2 { transform: rotate(72deg); animation-delay: 4.2s; }
-.petal-3 { transform: rotate(144deg); animation-delay: 4.4s; }
-.petal-4 { transform: rotate(216deg); animation-delay: 4.6s; }
-.petal-5 { transform: rotate(288deg); animation-delay: 4.8s; }
+.petal-1 { --initial-rotation: 0deg; animation-delay: 10.0s; }
+.petal-2 { --initial-rotation: 72deg; animation-delay: 10.2s; }
+.petal-3 { --initial-rotation: 144deg; animation-delay: 10.4s; }
+.petal-4 { --initial-rotation: 216deg; animation-delay: 10.6s; }
+.petal-5 { --initial-rotation: 288deg; animation-delay: 10.8s; }
 
 .center {
     position: absolute;
     width: 30px;
     height: 30px;
-    background-color: #ffd700; /* 花の中心の色 (黄色) */
+    background-color: #ffd700;
     border-radius: 50%;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 3;
-    opacity: 0; /* 最初は非表示 */
-    animation: fadeIn 1s forwards 6s; /* 中心がフェードイン (6秒遅延) */
+    opacity: 0;
+    animation: fadeIn 1s forwards 12s; /* 中心がフェードイン (開花後) */
 }
 
-/* 花が開いた後のきらめき */
 .glow {
-    animation: centerGlow 1.5s infinite alternate 6.5s; /* fadeInの後にきらめき開始 */
+    animation: centerGlow 1.5s infinite alternate 12.5s;
 }
 
 /* アニメーションの定義 */
 
 @keyframes sunrise {
-    0% { background: linear-gradient(to bottom, #0a0a2a, #333366); } /* 深い夜の色 */
-    50% { background: linear-gradient(to bottom, #87ceeb, #f0f8ff); } /* 明るい空 */
+    0% { background: linear-gradient(to bottom, #0a0a2a, #333366); }
+    50% { background: linear-gradient(to bottom, #87ceeb, #f0f8ff); }
     100% { background: linear-gradient(to bottom, #87ceeb, #f0f8ff); }
 }
 
 @keyframes sunRise {
     0% { top: 80%; }
-    100% { top: 10%; } /* 画面上部まで昇る */
+    100% { top: 10%; }
+}
+
+@keyframes budGrow { /* 芽が地面から出てくる */
+    0% { height: 0px; bottom: 0; }
+    100% { height: 30px; bottom: 0; }
+}
+
+@keyframes stemGrow { /* 茎が伸びる */
+    0% { height: 0px; bottom: 0; }
+    100% { height: 150px; bottom: 0; }
+}
+
+@keyframes budAppear { /* つぼみが出現し、適切な位置に移動 */
+    0% { opacity: 0; bottom: 0; }
+    100% { opacity: 1; bottom: 140px; } /* 茎の先端に移動 */
+}
+
+@keyframes budFadeOut { /* つぼみが消える */
+    0% { opacity: 1; }
+    100% { opacity: 0; display: none; } /* 最後はdisplay:noneで完全に消す */
+}
+
+@keyframes flowerFadeIn { /* 花がフェードインする */
+    0% { opacity: 0; bottom: 0; }
+    100% { opacity: 1; bottom: 140px; } /* 茎の先端に移動 */
 }
 
 @keyframes sway {
-    0% { transform: rotate(-2deg); }
-    100% { transform: rotate(2deg); }
+    0% { transform: translateX(-50%) rotate(-2deg); }
+    100% { transform: translateX(-50%) rotate(2deg); }
 }
 
 @keyframes faceSun {
     0% { transform: translateX(-50%) rotate(0deg); }
-    50% { transform: translateX(-50%) rotate(-5deg); } /* 少しうつむく */
-    100% { transform: translateX(-50%) rotate(0deg); } /* まっすぐ上を向く */
+    50% { transform: translateX(-50%) rotate(-5deg); }
+    100% { transform: translateX(-50%) rotate(0deg); }
 }
 
 @keyframes openPetal {
     0% {
-        transform: rotate(var(--initial-rotation, 0deg)) scaleY(0.1) rotateX(70deg); /* 閉じた状態 (内側に傾き、縮小) */
-        opacity: 0; /* 最初は完全に見えない */
+        transform: rotate(var(--initial-rotation, 0deg)) scaleY(0.01) rotateX(90deg);
+        opacity: 0;
     }
     30% {
-        transform: rotate(var(--initial-rotation, 0deg)) scaleY(0.4) rotateX(40deg); /* 少し開いて、まだ傾いている */
-        opacity: 1; /* 徐々に現れる */
+        transform: rotate(var(--initial-rotation, 0deg)) scaleY(0.3) rotateX(60deg);
+        opacity: 1;
     }
     70% {
-        transform: rotate(var(--initial-rotation, 0deg)) scaleY(0.9) rotateX(10deg); /* ほぼ開ききり、少し傾きが残る */
+        transform: rotate(var(--initial-rotation, 0deg)) scaleY(0.8) rotateX(20deg);
     }
     100% {
-        transform: rotate(var(--initial-rotation, 0deg)) scaleY(1) rotateX(0deg); /* 全開 (まっすぐになる) */
+        transform: rotate(var(--initial-rotation, 0deg)) scaleY(1) rotateX(0deg);
         opacity: 1;
     }
 }
-
-/* 個々の花びらの初期回転を設定 */
-.petal-1 { --initial-rotation: 0deg; }
-.petal-2 { --initial-rotation: 72deg; }
-.petal-3 { --initial-rotation: 144deg; }
-.petal-4 { --initial-rotation: 216deg; }
-.petal-5 { --initial-rotation: 288deg; }
-
 
 @keyframes fadeIn {
     0% { opacity: 0; }
@@ -165,8 +216,8 @@ body {
         transform: translate(-50%, -50%) scale(1);
     }
     50% {
-        box-shadow: 0 0 20px #ffea00, 0 0 40px #ffea00 inset; /* 強く光る */
-        transform: translate(-50%, -50%) scale(1.1); /* 少し拡大 */
+        box-shadow: 0 0 20px #ffea00, 0 0 40px #ffea00 inset;
+        transform: translate(-50%, -50%) scale(1.1);
     }
     100% {
         box-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700 inset;
